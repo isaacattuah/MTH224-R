@@ -1,5 +1,6 @@
 # MTH-224-R
 A compilation of R code implemented during my Introduction to Probability and Statistics Class. 
+
 This course was instructed by Professor [Aleksandra Gorzycka-Sikora](https://www.linkedin.com/in/aleksandra-gorzycka-sikora-14291a138)
 
 ## Course Description
