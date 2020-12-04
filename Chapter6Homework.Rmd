@@ -1,0 +1,183 @@
+---
+title: "Chapter 6 Homework"
+author: "Isaac Attuah"
+date: "11/15/2020"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+***
+## Import Iris Data
+
+Attuah starts with 'A' hence this document will be an analysis of `Sepal.Width`.
+```{r}
+mydata <- iris
+#Extract sepal widths into variable
+sepal_width = mydata$Sepal.Width
+```
+***
+```{r}
+
+```
+## Check Iris Data
+
+The `head()` function displays 6 data columns by default.
+```{r}
+head(mydata)
+```
+
+### Check Iris Data (with parameter)
+We can define a value `n` in `head(mydata, n)` where n is the number of columns to be displayed.
+```{r}
+head(mydata,10)
+```
+***
+# Descriptive Statistics
+## Measures of Central Tendency
+
+## Mean
+The mean is the average of all the iris data sepal widths.
+```{r}
+#Compute the Mean
+mean(sepal_width)
+```
+
+## Median
+The median is the middle of all the data when sorted by increasing sepal widths.
+```{r}
+#Compute the Median
+median(sepal_width)
+```
+
+Since the median, `r median(sepal_width)`, is less than the mean,`r mean(sepal_width)`, the data will be skewed to the right. 
+
+## Mode
+The mode is the most frequently occurring value in the data set.
+```{r}
+#modeest library must be imported to use mfv() for mode
+require(modeest)
+#Compute the Mode
+mfv(sepal_width)
+```
+
+***
+
+## Measure of Variablity
+<p style="color:red">Range</p>
+The range provides the maximum and minimum values of the sepal widths.
+```{r}
+#Compute the Range
+range(sepal_width)
+```
+<p style="color:red">Interquartile Range</p>
+We will compute the various percentiles (relates to quantiles) in 5% intervals.
+The IQR is a measure of statistical dispersion, between the upper and lower quantiles (75% and 25% percentiles).
+```{r}
+# Compute the quantiles/percentiles
+quantile(sepal_width, seq(0, 1, 0.05))
+#Compute the Interquartile Range
+IQR(sepal_width)
+```
+### Variance
+The variance helps to measure how far sepal widths are spread out from the mean, `r mean(sepal_width)`.
+```{r}
+#Compute the Variance
+var(sepal_width)
+```
+Sepal widths are spread out by `r var(sepal_width)` from the mean, `r mean(sepal_width)`.
+
+### Standard Deviation
+The Standard Deviation measures the amount of variation or dispersion of sepal widths. It indicates the extent of deviation for the sepal width group as a whole.
+```{r}
+#Compute the Standard Deviation
+sd(sepal_width)
+```
+The average deviation from the mean value is `r sd(sepal_width)`.
+Since the standard deviation is low, the data points tend to be very close to the mean. 
+
+***
+## Summary Data
+The `summary()` function provides a general summary of the entire data set.
+```{r}
+#Compute the Sepal Width Summary
+summary(mydata)
+```
+***
+# Plots
+## BoxPlot 
+The median, upper and lower quantile are used to construct a box plot.
+The length of the box is equal to the IQR.
+The left and right whiskers represent the first and fourth quarters of the data, while the two middle quarters of the data are represented, respectively, by the two sections of the box, one to the left and one to the right of the median line.
+```{r}
+message("Upper Quantile: ", quantile(sepal_width, 0.75)) #Upper Quantile (75) (Upper line) 
+message("Median: ", median(sepal_width)) #Median (Middle Line)
+message("Lower Quantile: ", quantile(sepal_width, 0.25))#Lower Quantile (25) (Lower line)
+message("Box Length: ",IQR(sepal_width)) #Box Length
+message("Whiskers: ", IQR(sepal_width) * 1.5) #Whiskers
+```
+
+```{r}
+boxplot(sepal_width,
+        data=mydata, 
+        main="Iris Data",
+        ylab="Sepal Width")
+```
+Since the upper whisker is slightly longer, the data is skewed to the right. This confirms our earlier hypothesis (mean > median).
+The BoxPlot also has an outlier below at 2.0 and three outliers from 4.0 upwards, this is indicated by the small circles. 
+
+We can hypothesize that longer sepal widths will be an expected outlier than shorter sepal widths.
+
+### BoxPlot by Groups
+```{r}
+boxplot(sepal_width~Species,
+        data=mydata,
+        main ="Iris Data",
+        col = c("red","blue","gold"),
+        ylab="Sepal Width")
+# '~' sign does the divisions by species
+```
+The Setosa sepal widths are skewed to the right (longer upper whisker) with an outlier between 2.0 and 2.5.
+The Versicolor seoal widths are skewed to the left (longer lower whisker)
+The Virginca sepal widths are normally skewed.
+
+The medians of Species are in increasing size of Versicolor, Virginica and Setosa.
+
+***
+## Histogram
+```{r}
+hist(sepal_width, 
+     main="Histogram Iris Data", 
+     xlab="Width", 
+     border="blue", 
+     col="lightblue",
+     breaks=10,
+     prob=TRUE)
+```
+The histogram of sepal widths is uniformly distributed.
+It has a few outliers after 4.0.
+
+### Histogram by Groups
+```{r}
+# install.packages("FSA")
+require(FSA)
+hist(sepal_width~Species,
+     data=mydata,
+     xlab="Sepal Width",
+     col="lightblue",
+     border="blue",
+     nrow=1,
+     ncol=3)
+```
+The Setosa sepal widths are skewed to the right with an outlier between 2.0 and 2.5.
+The Versicolor sepal widths are skewed to the left.
+The Virginca sepal widths are normally skewed.
+
+***
+
+## Q-Q Plot
+```{r}
+qqnorm(sepal_width, pch = 1, frame = FALSE)
+qqline(sepal_width, col = "red", lwd = 2)
+```
+Since a significant number of points fall along the red line, we can be confirm the data was collected from a normal distribution.
