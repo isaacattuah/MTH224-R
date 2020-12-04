@@ -1,0 +1,194 @@
+---
+title: "Daily Screen Time"
+author: "Jefferson, Violet, Leah and Isaac"
+date: "11/25/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+***
+## Data Manipulation
+### Import Screen Time Data
+We chose to collect our data through a Google form that was sent out to friends and family across various social media platforms. The survey simply asked students to type in their total screen time and their social media screen time in minutes for an average day. We gathered the responses on a Google Sheet and converted it to a csv file.
+```{r}
+my_data <- read.csv(file.choose())
+```
+
+***
+### Check Screen Time Data
+
+The `head()` function displays 6 data columns by default.
+```{r}
+head(my_data)
+```
+
+### Check Screen Time Data (with parameter)
+```{r}
+head(my_data,10)
+```
+
+***
+## Descriptive Statistics
+### Measures of Central Tendency
+The means of both Total_Screen_Time and Social_Media are greater than the medians of either variable. This implies that the distribution is right skewed.
+
+#### Mean
+```{r}
+mean(my_data$Total_Screen_Time)
+mean(my_data$Social_Media)
+```
+
+#### Median
+```{r}
+median(my_data$Total_Screen_Time)
+median(my_data$Social_Media)
+```
+
+#### Mode
+```{r}
+require(modeest)
+mfv(my_data$Total_Screen_Time)
+mfv(my_data$Social_Media)
+```
+
+***
+
+## Measures of Variablity
+<p style="color:red">Range</p>
+The ranges below provide the maximum and minimum values of the Total_Screen_Time and the Social_Media. Social media screen time has a smaller and lower range than total screen time, illustrating that it is a subset of total screen time. 
+```{r}
+range(my_data$Total_Screen_Time)
+range(my_data$Social_Media)
+```
+<p style="color:red">Interquartile Range</p>
+
+The Interquartile Range gives us the middle 50% of our data for both Total_Screen_Time and Social_Media. A smaller interquartile range indicates a less variable data set. This is evident as the Social_Media IQR is smaller than the IQR of Total_Screen_Time and the variability of Social_Media is also much smaller than Total_Screen_Time.  
+```{r}
+# Compute the quantiles/percentiles
+IQR(my_data$Total_Screen_Time)
+IQR(my_data$Social_Media)
+```
+
+### Variance
+
+```{r}
+#Compute the Variance
+var(my_data$Total_Screen_Time)
+var(my_data$Social_Media)
+```
+
+### Standard Deviation
+
+```{r}
+#Compute the Standard Deviation
+sd(my_data$Total_Screen_Time)
+sd(my_data$Social_Media)
+```
+
+***
+## Summary Data
+
+```{r}
+#Compute the Sepal Width Summary
+summary(my_data)
+```
+
+***
+## Plots
+### Box Plots
+Looking at the Screen Time outliers there are some that would make sense to eliminate. For example, the data point of 1500 minutes is impossible since there are 1440 minutes in a day. Therefore, it would make sense to eliminate this data point. Both boxplots also indicate that the data is right skewed.
+```{r}
+#Outlier Rows
+#Outlier rows for Average Total Screen Time
+message("Screen Time Outliers:")
+boxplot.stats(my_data$Total_Screen_Time)$out
+message("Social Media Time Outliers:")
+#Outlier rows for Average Social Media Time
+boxplot.stats(my_data$Social_Media)$out
+#box plots
+par(mfrow=c(1, 2))  # divide graph area in 2 columns
+boxplot(my_data$Total_Screen_Time, main="Average Total Screen Time")  
+boxplot(my_data$Social_Media, main="Average Social Media Time")
+```
+
+### Scatter Plots
+```{r}
+#observed positive correlation
+scatter.smooth(x=my_data$Total_Screen_Time, y=my_data$Social_Media, main=" Average Social Media Time ~ Average Screen Time",xlab="Average Screen Time",ylab="Average Social Media Time")
+```
+
+### Density Plots
+```{r}
+library(e1071)
+par(mfrow=c(1, 2))  # divide graph area in 2 columns
+plot(density(my_data$Total_Screen_Time), main="Total Screen Time", ylab="Frequency", sub=paste("Skewness:", round(e1071::skewness(cars$speed), 2)))  
+polygon(density(my_data$Total_Screen_Time), col="gold")
+plot(density(my_data$Social_Media), main="Social Media Time", ylab="Frequency", sub=paste("Skewness:", round(e1071::skewness(cars$dist), 2)))  
+polygon(density(my_data$Social_Media), col="gold")
+```
+***
+
+## Correlation
+There is sufficient evidence to conclude that there is a significant linear relationship between Total_Screen_Time and Social_Media because the correlation coefficient is significantly different from zero. We determined this by calculating the p value which is less than the significance level. Therefore, the null hypothesis is rejected. 
+The correlation co-efficient was calculated using the `cor()` function.
+```{r}
+message("Correlation Co-efficient: ",cor(my_data$Total_Screen_Time, my_data$Social_Media))
+cor.test(my_data$Total_Screen_Time, my_data$Social_Media)
+```
+
+## Data Plots
+```{r}
+plot(my_data)
+plot(x=my_data$Total_Screen_Time, y = my_data$Social_Media, xlab = "Average Total Screen Time", ylab = "Average Social Media Time", main = "Social Media ~ Screen Time")
+```
+
+## Linear Model
+```{r}
+plot(x=my_data$Total_Screen_Time, y = my_data$Social_Media, xlab = "Average Total Screen Time", ylab = "Average Social Media Time", main = "Social Media ~ Screen Time")
+linearmod = lm(my_data$Social_Media~my_data$Total_Screen_Time)
+abline(linearmod, col ="red")
+message("Least Square Line:")
+linearmod
+```
+
+The linear regression line does fit the data. The line has a similar number of points above and below it at any given interval. The variables begin strongly correlated when screen time is low and the correlation weakens as screen time increases, once more supporting that social media time could effectively be a subset of screen time since the spread of social media time is dependent on screen time.
+
+***
+```{r}
+summary(linearmod)
+```
+
+Since the p-value is below the 0.05 threshold, the model is statistically significant. We can safely reject the null hypothesis that the coefficient beta of the predictor is zero. We can now go ahead and use it to predict (or estimate) the dependent variable.
+
+***
+## QQ Plots
+### Social Media
+```{r}
+qqnorm(my_data$Social_Media, pch = 1, frame = FALSE)
+qqline(my_data$Social_Media, col = "red", lwd = 2)
+```
+
+Most points do not fall on the line, indicating that Social Media Time fits poorly on the normal distribution.
+
+### Total Screen Time
+```{r}
+qqnorm(my_data$Total_Screen_Time, pch = 1, frame = FALSE)
+qqline(my_data$Total_Screen_Time, col = "red", lwd = 2)
+```
+
+Most points do not fall on the line, indicating that Total Screen Time fits poorly on the normal distribution. There are more points falling on the line for screen time than for social media time indicating that while social media time does not fit the normal distribution well, it fits the normal distribution better than social media time does.
+
+### Total Screen Time vs Social Media Time
+```{r}
+qqnorm(x = my_data$Total_Screen_Time, y = my_data$Social_Media, pch = 1, frame = FALSE)
+```
+
+Since the data does not form a straight line, the two variables are not distributed similarly.
+
+## Analysis
+
+The variables are positively correlated with a weaker correlation as screen time increases.This can be attributed to the fact that social media is conventionally accessed via cellphone.
+Considering this, it is likely that most if not all time spent using social media was also time spent using a phone, effectively making social media time a subset of screen time. 
+
+This is a possible explanation for why only a single survey response had higher social media time than screen time. Social media time being a subset of screen time would also explain why there is a greater spread as screen time increases, since there is a higher maximum and the same minimum so the range of social media time values is greater.
